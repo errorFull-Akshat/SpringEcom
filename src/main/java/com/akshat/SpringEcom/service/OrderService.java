@@ -60,6 +60,9 @@ public class OrderService {
             }
 
             product.setStockQuantity(product.getStockQuantity() - itemReq.quantity());
+            if (product.getStockQuantity() == 0) {
+                product.setProductAvailable(false);
+            }
             productRepo.save(product);
 
             OrderItem orderItem = OrderItem.builder()
