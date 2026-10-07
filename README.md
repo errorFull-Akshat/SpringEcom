@@ -17,6 +17,7 @@ that locks stock rows, validates inventory and rolls back atomically on failure.
 [Features](#features) •
 [Architecture](#architecture) •
 [API Reference](#api-reference) •
+[Screenshots](#screenshots) •
 [Getting Started](#getting-started) •
 [Order Engine](#how-the-order-engine-works) •
 [Testing](#testing-with-postman)
@@ -222,6 +223,60 @@ Two form-data parts:
 
 ---
 
+## Screenshots
+
+All requests below were run against a local instance with Postman.
+
+<details open>
+<summary><b>Place Order</b> · <code>POST /api/place</code> → <code>201 Created</code></summary>
+<br/>
+
+![Place Order](docs/screenshots/place-order.png)
+
+</details>
+
+<details>
+<summary><b>Create Product with image</b> · <code>POST /api/product</code> → <code>201 Created</code></summary>
+<br/>
+
+![Create Product](docs/screenshots/create-product.png)
+
+</details>
+
+<details>
+<summary><b>Get All Products</b> · <code>GET /api/products</code> → <code>200 OK</code></summary>
+<br/>
+
+![Get All Products](docs/screenshots/get-all-products.png)
+
+</details>
+
+<details>
+<summary><b>Get Product by Id</b> · <code>GET /api/product/1</code> → <code>200 OK</code></summary>
+<br/>
+
+![Get Product by Id](docs/screenshots/get-product-by-id.png)
+
+</details>
+
+<details>
+<summary><b>Search Products</b> · <code>GET /api/products/search?keyword=apple</code> → <code>200 OK</code></summary>
+<br/>
+
+![Search Products](docs/screenshots/search-products.png)
+
+</details>
+
+<details>
+<summary><b>Get All Orders</b> · <code>GET /api/orders</code> → <code>200 OK</code></summary>
+<br/>
+
+![Get All Orders](docs/screenshots/get-all-orders.png)
+
+</details>
+
+---
+
 ## How the order engine works
 
 The core of the project is `OrderService.placeOrder`, written to stay correct when many customers buy the same product at the same time.
@@ -272,7 +327,7 @@ sequenceDiagram
 ### 1. Clone
 
 ```bash
-git clone https://github.com/<your-username>/SpringEcom.git
+git clone https://github.com/errorFull-Akshat/SpringEcom.git
 cd SpringEcom
 ```
 
@@ -350,7 +405,7 @@ A ready-made collection is included in [`postman/SpringEcom.postman_collection.j
 
 <div align="center">
 
-**Built by [Akshat Raj](https://github.com/<your-username>)** · B.Tech CSE, KIIT University
+**Built by [Akshat Raj](https://github.com/errorFull-Akshat)** · B.Tech CSE, KIIT University
 
 If you found this project useful, consider giving it a ⭐
 
