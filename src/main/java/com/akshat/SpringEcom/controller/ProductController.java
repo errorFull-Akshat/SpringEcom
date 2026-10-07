@@ -67,7 +67,7 @@ public class ProductController {
             return new ResponseEntity<>("Deleted!!", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+}
     }
 
     @GetMapping("/products/search")

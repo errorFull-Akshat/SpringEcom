@@ -2,6 +2,7 @@ package com.akshat.SpringEcom.controller;
 import com.akshat.SpringEcom.model.dto.OrderRequest;
 import com.akshat.SpringEcom.model.dto.OrderResponse;
 import com.akshat.SpringEcom.service.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/place")
-    public ResponseEntity<OrderResponse> placeOrder(@RequestBody OrderRequest orderRequest){
+    public ResponseEntity<OrderResponse> placeOrder(@Valid @RequestBody OrderRequest orderRequest){
         OrderResponse orderResponse = orderService.placeOrder(orderRequest);
         return new ResponseEntity<>(orderResponse, HttpStatus.CREATED);
     }

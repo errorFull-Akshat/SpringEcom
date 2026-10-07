@@ -1,0 +1,167 @@
+{
+  "info": {
+    "name": "SpringEcom API",
+    "description": "Requests for the SpringEcom Spring Boot REST API. Run in order: create products, search, place an order, then try the error cases.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Hello",
+          "request": { "method": "GET", "url": "{{baseUrl}}/hello" }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/product",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "product",
+                  "type": "text",
+                  "contentType": "application/json",
+                  "value": "{\n  \"id\": 0,\n  \"name\": \"iPhone 15\",\n  \"description\": \"128GB, Black\",\n  \"brand\": \"Apple\",\n  \"price\": 69999.00,\n  \"category\": \"Mobile\",\n  \"releaseDate\": \"22-09-2023\",\n  \"productAvailable\": true,\n  \"stockQuantity\": 10\n}"
+                },
+                { "key": "imageFile", "type": "file", "src": [] }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Products",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/products" }
+        },
+        {
+          "name": "Get Product By Id",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/product/1" }
+        },
+        {
+          "name": "Search Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/products/search?keyword=apple",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", "search"],
+              "query": [{ "key": "keyword", "value": "apple" }]
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "url": "{{baseUrl}}/api/product/1",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "product",
+                  "type": "text",
+                  "contentType": "application/json",
+                  "value": "{\n  \"id\": 1,\n  \"name\": \"iPhone 15\",\n  \"description\": \"128GB, Blue\",\n  \"brand\": \"Apple\",\n  \"price\": 64999.00,\n  \"category\": \"Mobile\",\n  \"releaseDate\": \"22-09-2023\",\n  \"productAvailable\": true,\n  \"stockQuantity\": 15\n}"
+                },
+                { "key": "imageFile", "type": "file", "src": [] }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/api/product/3" }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Place Order",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/place",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Akshat\",\n  \"email\": \"akshat@example.com\",\n  \"items\": [\n    { \"productId\": 1, \"quantity\": 2 },\n    { \"productId\": 2, \"quantity\": 1 }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Get All Orders",
+          "request": { "method": "GET", "url": "{{baseUrl}}/api/orders" }
+        }
+      ]
+    },
+    {
+      "name": "Error Cases",
+      "item": [
+        {
+          "name": "Insufficient Stock (400)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/place",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Akshat\",\n  \"email\": \"akshat@example.com\",\n  \"items\": [ { \"productId\": 1, \"quantity\": 500 } ]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Unknown Product (404)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/place",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Akshat\",\n  \"email\": \"akshat@example.com\",\n  \"items\": [ { \"productId\": 999, \"quantity\": 1 } ]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Invalid Email (400)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/place",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Akshat\",\n  \"email\": \"not-an-email\",\n  \"items\": [ { \"productId\": 1, \"quantity\": 1 } ]\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        },
+        {
+          "name": "Empty Items (400)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/api/place",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerName\": \"Akshat\",\n  \"email\": \"akshat@example.com\",\n  \"items\": []\n}",
+              "options": { "raw": { "language": "json" } }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

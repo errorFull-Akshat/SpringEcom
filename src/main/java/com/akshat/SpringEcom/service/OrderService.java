@@ -18,7 +18,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -31,6 +33,22 @@ public class OrderService {
 
     @Transactional
     public OrderResponse placeOrder(OrderRequest request) {
+
+        if (request.items() == null || request.items().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Order must contain at least one item");
+        }
+
+        // Row-lock every product up front, in ascending id order, so concurrent orders
+        // can't both pass the stock check or deadlock on each other's locks
+        Map<Integer, Product> lockedProducts = new HashMap<>();
+        request.items().stream()
+                .map(OrderItemRequest::productId)
+                .distinct()
+                .sorted()
+                .forEach(productId -> lockedProducts.put(productId,
+                        productRepo.findByIdForUpdate(productId)
+                                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                        "Product not found: " + productId))));
 
         Order order = new Order();
         String orderId = "ORD" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
@@ -48,10 +66,7 @@ public class OrderService {
                         "Quantity must be positive for product " + itemReq.productId());
             }
 
-            // Row lock so concurrent orders can't both pass the stock check
-            Product product = productRepo.findByIdForUpdate(itemReq.productId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                            "Product not found: " + itemReq.productId()));
+            Product product = lockedProducts.get(itemReq.productId());
 
             if (product.getStockQuantity() < itemReq.quantity()) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -103,7 +118,7 @@ public class OrderService {
     @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrderResponses() {
 
-        List<Order> orders = orderRepo.findAll();
+        List<Order> orders = orderRepo.findAllWithItems();
         List<OrderResponse> orderResponses = new ArrayList<>();
 
         for (Order order : orders) {

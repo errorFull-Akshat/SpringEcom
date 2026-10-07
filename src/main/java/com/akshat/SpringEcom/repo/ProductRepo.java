@@ -1,5 +1,6 @@
 package com.akshat.SpringEcom.repo;
 
+
 import com.akshat.SpringEcom.model.Product;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
