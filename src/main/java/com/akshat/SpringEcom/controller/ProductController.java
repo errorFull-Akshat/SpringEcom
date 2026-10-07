@@ -46,6 +46,10 @@ public class ProductController {
 
     @PutMapping("/product/{id}")
     public ResponseEntity<String> updateProduct(@PathVariable int id, @RequestPart Product product, @RequestPart MultipartFile imageFile) {
+        if (productService.getProductById(id) == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        product.setId(id);
         Product updateProduct = null;
         try {
             updateProduct = productService.addOrUpdateProduct(product, imageFile);
