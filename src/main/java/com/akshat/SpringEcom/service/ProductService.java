@@ -33,6 +33,13 @@ public class ProductService {
         product.setImageName(imageFile.getOriginalFilename());
         product.setImageData(imageFile.getBytes());
         product.setImageType(imageFile.getContentType());
+
+        // Restocking an out-of-stock product makes it available again
+        if (product.getStockQuantity() > 0) {
+            productRepo.findById(product.getId())
+                    .filter(existing -> existing.getStockQuantity() == 0)
+                    .ifPresent(existing -> product.setProductAvailable(true));
+        }
         return productRepo.save(product);
     }
 
