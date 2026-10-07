@@ -9,9 +9,11 @@ import com.akshat.SpringEcom.model.dto.OrderRequest;
 import com.akshat.SpringEcom.model.dto.OrderResponse;
 import com.akshat.SpringEcom.repo.OrderRepo;
 import com.akshat.SpringEcom.repo.ProductRepo;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,6 +29,7 @@ public class OrderService {
     @Autowired
     private OrderRepo orderRepo;
 
+    @Transactional
     public OrderResponse placeOrder(OrderRequest request) {
 
         Order order = new Order();
@@ -40,8 +43,21 @@ public class OrderService {
         List<OrderItem> orderItems = new ArrayList<>();
         for (OrderItemRequest itemReq : request.items()) {
 
-            Product product = productRepo.findById(itemReq.productId())
-                    .orElseThrow(() -> new RuntimeException("Product not found"));
+            if (itemReq.quantity() <= 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Quantity must be positive for product " + itemReq.productId());
+            }
+
+            // Row lock so concurrent orders can't both pass the stock check
+            Product product = productRepo.findByIdForUpdate(itemReq.productId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "Product not found: " + itemReq.productId()));
+
+            if (product.getStockQuantity() < itemReq.quantity()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "Insufficient stock for " + product.getName() + ": requested "
+                                + itemReq.quantity() + ", available " + product.getStockQuantity());
+            }
 
             product.setStockQuantity(product.getStockQuantity() - itemReq.quantity());
             productRepo.save(product);
@@ -81,7 +97,7 @@ public class OrderService {
         return orderResponse;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public List<OrderResponse> getAllOrderResponses() {
 
         List<Order> orders = orderRepo.findAll();
